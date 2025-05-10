@@ -1,0 +1,132 @@
+### Authentication Endpoints
+
+### Register a new user
+POST http://localhost:3000/api/auth/register/
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "password123",
+    "name": "John Doe",
+    "role": "citizen"
+}
+
+### Login user
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "user1@example.com",
+    "password": "password123"
+}
+
+### Get current user profile
+GET http://localhost:3000/api/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+
+
+
+### Issue Endpoints
+
+### Create a new issue
+POST http://localhost:3000/api/issues
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+Content-Type: application/json
+
+{
+    "title": "Electricity Issue",
+    "description": "There is no electricity in my area",
+    "category": "ELECTRICITY",
+    "location_lat": 40.7128,
+    "location_lng": 74.0060,
+    "location_address": "Sector 15, Chandigarh",
+    "status": "PENDING"
+}
+
+### Get issues by category
+
+GET http://localhost:3000/api/issues?category=ROAD&status=PENDING
+
+### Get all issues
+GET http://localhost:3000/api/issues?page=1&limit=5
+
+### Get user's issues
+GET http://localhost:3000/api/issues/user?page=1&limit=5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+
+
+### Get issue by ID
+GET http://localhost:3000/api/issues/8afbda31-4719-4c7b-9bc8-5a1d4ee3c8c6
+
+### Update issue
+PUT http://localhost:3000/api/issues/8afbda31-4719-4c7b-9bc8-5a1d4ee3c8c6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+Content-Type: application/json
+
+{
+    "title": "Updated Issue Title",
+    "description": "Updated description",
+    "status": "PENDING"
+}
+
+### Delete issue
+DELETE http://localhost:3000/api/issues/8afbda31-4719-4c7b-9bc8-5a1d4ee3c8c6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+
+
+### Vote Endpoints
+
+### Vote on issue
+POST http://localhost:3000/api/votes/issues/61316b93-336a-48d1-bc52-1c2c24957a81/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+
+
+
+### Get vote count for an issue
+GET http://localhost:3000/api/votes/issues/61316b93-336a-48d1-bc52-1c2c24957a81/count
+Authorization: Bearer YOUR_JWT_TOKEN
+
+
+### Remove vote from issue
+DELETE http://localhost:3000/api/votes/issues/61316b93-336a-48d1-bc52-1c2c24957a81/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+
+
+### Media Endpoints
+
+### Upload media for issue
+POST http://localhost:3000/api/media/issues/ISSUE_ID/
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: multipart/form-data
+
+### Get media for issue
+GET http://localhost:3000/api/media/issues/8afbda31-4719-4c7b-9bc8-5a1d4ee3c8c6
+
+### Delete media
+DELETE http://localhost:3000/api/media/11ab394f-0056-431d-b2cb-00f281e715cc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjdiYjZiZDRjLTBmN2YtNGFiMy1hYmRjLWRkYjljMjExYTkwYSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJyb2xlIjoiY2l0aXplbiIsImlhdCI6MTc0Njg3MDYzMCwiZXhwIjoxNzQ2OTU3MDMwfQ.HnetjPETrpoJRifZtvcRSU_2Cu1lUMrahnAi9C1bRJs
+
+
+
+
+### Analytics Endpoints
+
+### Get issue statistics - voting count
+GET http://localhost:3000/api/analytics/issues-by-category?page=1&limit=10
+
+### Get issue statistics - by category
+GET http://localhost:3000/api/analytics/daily-submissions?page=1&limit=10
+
+### Get most voted issues by category
+GET http://localhost:3000/api/analytics/most-voted-by-category?page=1&limit=10
+
+
+### Map Endpoints
+
+### Get issues for map view
+GET http://localhost:3000/api/map/issues?bounds=[26, 70, 33.4565, 90.6483]
+
+### Get issue details
+GET http://localhost:3000/api/map/issues/8afbda31-4719-4c7b-9bc8-5a1d4ee3c8c6
+
+

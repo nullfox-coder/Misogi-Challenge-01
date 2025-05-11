@@ -16,6 +16,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { register } from '../services/auth.service';
 import type { RegisterCredentials } from '../types/auth';
 import type { AxiosError } from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const [credentials, setCredentials] = useState<RegisterCredentials>({
@@ -27,6 +28,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +36,7 @@ const Register = () => {
 
     try {
       const response = await register(credentials);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      login(response.token, response.user);
       toast({
         title: 'Registration successful',
         status: 'success',

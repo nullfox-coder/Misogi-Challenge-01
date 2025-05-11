@@ -89,6 +89,11 @@ const getIssues = async (filters = {}, page = 1, limit = 10) => {
         };
     }
 
+    // User ID filter
+    if (filters.user_id) {
+        where.user_id = filters.user_id;
+    }
+
     // Calculate offset
     const offset = (page - 1) * limit;
 
@@ -102,7 +107,7 @@ const getIssues = async (filters = {}, page = 1, limit = 10) => {
     }
 
     // Get paginated issues with user and media info
-    const issues = await Issue.findAll({
+    let issues = await Issue.findAll({
         where,
         include: [
             {
@@ -120,13 +125,13 @@ const getIssues = async (filters = {}, page = 1, limit = 10) => {
     });
 
     // If user is authenticated, check if they've voted on each issue
-    if (filters.userId) {
+    if (filters.user_id) {
         const issuesWithVoteStatus = await Promise.all(
             issues.map(async (issue) => {
                 const hasVoted = await Vote.findOne({
                     where: {
                         issue_id: issue.id,
-                        user_id: filters.userId
+                        user_id: filters.user_id
                     }
                 });
                 return {

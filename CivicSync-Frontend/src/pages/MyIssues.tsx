@@ -36,6 +36,18 @@ import axios from 'axios';
 import type { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+interface Media {
+  id: string;
+  file_path: string;
+  file_type: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 interface Issue {
   id: string;
   title: string;
@@ -44,9 +56,16 @@ interface Issue {
   status: string;
   vote_count: number;
   location_address: string;
-  created_at: string;
-  image_url?: string;
-  image?: File;
+  location_lat?: number;
+  location_lng?: number;
+  createdAt: string;
+  updatedAt?: string;
+  user_id?: string;
+  User?: User;
+  Media?: Media[];
+  image_url?: string; // For backward compatibility
+  image?: File; // For file uploads
+  has_voted?: boolean;
 }
 
 interface Pagination {
@@ -67,6 +86,8 @@ const MyIssues = () => {
   const navigate = useNavigate();
   const [selectedIssueDetails, setSelectedIssueDetails] = useState<Issue | null>(null);
   const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [page, setPage] = useState(1);
 
   const textColor = useColorModeValue('gray.600', 'gray.300');
   const secondaryTextColor = useColorModeValue('gray.500', 'gray.400');
@@ -78,13 +99,21 @@ const MyIssues = () => {
         throw new Error('No authentication token found');
       }
 
-      const response = await axios.get<{ issues: Issue[], pagination: Pagination }>('http://localhost:3000/api/issues/user', {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.get<{ issues: Issue[], pagination: Pagination }>(
+        'http://localhost:3000/api/issues/user', 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            page: page,
+            limit: 10
+          }
         }
-      });
-      // Update to use response.data.issues instead of response.data
+      );
+      
       setIssues(Array.isArray(response.data.issues) ? response.data.issues : []);
+      setPagination(response.data.pagination);
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       toast({
@@ -102,7 +131,7 @@ const MyIssues = () => {
 
   useEffect(() => {
     fetchIssues();
-  }, []);
+  }, [page]);
 
   const handleDelete = async (issueId: string) => {
     try {
@@ -219,6 +248,38 @@ const MyIssues = () => {
     }
   };
 
+  const formatDateString = (issue: Issue | null | undefined): string => {
+    if (!issue) return 'N/A';
+    
+    if (issue.createdAt) {
+      const date = new Date(issue.createdAt);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+    
+    return 'N/A';
+  };
+
+  // Function to get image URL from Media array
+  const getImageUrl = (issue: Issue | null): string | null => {
+    if (!issue) return null;
+    
+    // First check if Media array exists and has items
+    if (issue.Media && issue.Media.length > 0) {
+      return issue.Media[0].file_path;
+    }
+    
+    // Fallback to the legacy image_url property
+    if (issue.image_url) {
+      return issue.image_url;
+    }
+    
+    return null;
+  };
+
   return (
     <Container maxW="container.lg" py={10}>
       <VStack spacing={8} align="stretch">
@@ -265,7 +326,7 @@ const MyIssues = () => {
                         {issue.category}
                       </Badge>
                       <Text fontSize="sm" color={secondaryTextColor}>
-                        {new Date(issue.created_at).toLocaleDateString()}
+                        {formatDateString(issue)}
                       </Text>
                     </HStack>
                     <Text fontSize="sm" color={secondaryTextColor}>
@@ -312,6 +373,28 @@ const MyIssues = () => {
             ))}
           </VStack>
         )}
+
+        {issues.length > 0 && pagination && (
+          <HStack justify="center" spacing={4} mt={4}>
+            <Button
+              isDisabled={!pagination.hasPrevPage}
+              onClick={() => setPage(p => p - 1)}
+            >
+              Previous
+            </Button>
+            <Text>
+              {Math.min((pagination.page - 1) * pagination.limit + 1, pagination.total)}-
+              {Math.min(pagination.page * pagination.limit, pagination.total)}/
+              {pagination.total} · Page {pagination.page} of {pagination.totalPages}
+            </Text>
+            <Button
+              isDisabled={!pagination.hasNextPage}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Next
+            </Button>
+          </HStack>
+        )}
       </VStack>
 
       {/* Edit Modal */}
@@ -349,9 +432,9 @@ const MyIssues = () => {
                       }
                     }}
                   />
-                  {selectedIssue?.image_url && !selectedIssue.image && (
+                  {getImageUrl(selectedIssue) && !selectedIssue?.image && (
                     <Image
-                      src={selectedIssue.image_url}
+                      src={getImageUrl(selectedIssue) || undefined}
                       alt="Current issue"
                       mt={2}
                       maxH="200px"
@@ -397,7 +480,7 @@ const MyIssues = () => {
                     Location: {selectedIssueDetails?.location_address}
                   </Text>
                   <Text fontSize="sm" color={secondaryTextColor}>
-                    Created: {selectedIssueDetails?.created_at && new Date(selectedIssueDetails.created_at).toLocaleDateString()}
+                    Created: {formatDateString(selectedIssueDetails)}
                   </Text>
                   <Text fontSize="sm" color="blue.500">
                     Votes: {selectedIssueDetails?.vote_count}
@@ -408,11 +491,11 @@ const MyIssues = () => {
                 </VStack>
               </Box>
 
-              {selectedIssueDetails?.image_url && (
+              {getImageUrl(selectedIssueDetails) && (
                 <Box>
                   <Text fontWeight="medium" mb={2}>Image:</Text>
                   <Image
-                    src={selectedIssueDetails.image_url}
+                    src={getImageUrl(selectedIssueDetails) || undefined}
                     alt="Issue"
                     borderRadius="md"
                     maxH="400px"

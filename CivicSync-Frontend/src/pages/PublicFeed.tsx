@@ -35,7 +35,7 @@ interface Issue {
   status: string;
   vote_count: number;
   location_address: string;
-  created_at: string;
+  createdAt: string;
   image_url?: string;
   has_voted?: boolean;
 }
@@ -169,24 +169,14 @@ const PublicFeed = () => {
     }
   };
 
-  const getTimeAgo = (date: string) => {
-    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    const intervals = {
-      year: 31536000,
-      month: 2592000,
-      week: 604800,
-      day: 86400,
-      hour: 3600,
-      minute: 60
-    };
-
-    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-      const interval = Math.floor(seconds / secondsInUnit);
-      if (interval >= 1) {
-        return `${interval} ${unit}${interval === 1 ? '' : 's'} ago`;
-      }
+  const formatDateString = (issue: Issue): string => {
+    if (!issue) return 'N/A';
+    
+    if (issue.createdAt) {
+      return issue.createdAt.split('T')[0];
     }
-    return 'Just now';
+    
+    return 'N/A';
   };
 
   return (
@@ -289,7 +279,7 @@ const PublicFeed = () => {
                         {issue.category}
                       </Badge>
                       <Text fontSize="sm" color={secondaryTextColor}>
-                        {getTimeAgo(issue.created_at)}
+                        {formatDateString(issue)}
                       </Text>
                     </HStack>
                     <Text fontSize="sm" color={secondaryTextColor}>
@@ -333,7 +323,9 @@ const PublicFeed = () => {
                   Previous
                 </Button>
                 <Text>
-                  Page {pagination.page} of {pagination.totalPages}
+                  {Math.min((pagination.page - 1) * pagination.limit + 1, pagination.total)}-
+                  {Math.min(pagination.page * pagination.limit, pagination.total)}/
+                  {pagination.total} · Page {pagination.page} of {pagination.totalPages}
                 </Text>
                 <Button
                   isDisabled={!pagination.hasNextPage}

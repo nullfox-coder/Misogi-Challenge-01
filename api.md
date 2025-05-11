@@ -24,3 +24,4 @@ DELETE /api/media/:id
 # Analytics
 GET /api/analytics/issues-by-category
 GET /api/analytics/daily-submissions
+GET /api/analytics/most-voted-by-category

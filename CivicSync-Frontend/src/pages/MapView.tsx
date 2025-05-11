@@ -11,9 +11,12 @@ import {
   Spinner,
   useToast,
   HStack,
+  Button,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import type { AxiosError } from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Set your Mapbox token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -43,6 +46,8 @@ const MapView = () => {
   const popupBg = useColorModeValue('white', 'gray.800');
   const popupTextColor = useColorModeValue('gray.600', 'gray.400');
   const toast = useToast();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   // Initialize map
   useEffect(() => {
@@ -64,9 +69,9 @@ const MapView = () => {
     };
   }, []);
 
-  // Fetch issues when map moves
+  // Fetch issues when map moves - but only if authenticated
   useEffect(() => {
-    if (!map.current) return;
+    if (!map.current || !isAuthenticated) return;
 
     const fetchIssues = async () => {
       if (!map.current) return;
@@ -74,7 +79,12 @@ const MapView = () => {
         setIsLoading(true);
         const bounds = map.current.getBounds();
         if (!bounds) return;
+        
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        
         const response = await axios.get<Issue[]>(`http://localhost:3000/api/map/issues`, {
+          headers,
           params: {
             bounds: JSON.stringify([
               bounds.getSouth(),
@@ -106,11 +116,11 @@ const MapView = () => {
       map.current?.off('load', fetchIssues);
       map.current?.off('moveend', fetchIssues);
     };
-  }, [toast]);
+  }, [toast, isAuthenticated]);
 
   // Add markers for issues
   useEffect(() => {
-    if (!map.current || !issues.length) return;
+    if (!map.current || !issues.length || !isAuthenticated) return;
 
     // Remove existing markers
     const markers = document.getElementsByClassName('issue-marker');
@@ -136,7 +146,10 @@ const MapView = () => {
         .getElement()
         .addEventListener('click', async () => {
           try {
-            const response = await axios.get<IssueDetails>(`http://localhost:3000/api/map/issues/${issue.id}`);
+            const token = localStorage.getItem('token');
+            const response = await axios.get<IssueDetails>(`http://localhost:3000/api/map/issues/${issue.id}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
             setSelectedIssue(response.data);
           } catch (error) {
             const axiosError = error as AxiosError<{ message: string }>;
@@ -149,7 +162,7 @@ const MapView = () => {
           }
         });
     });
-  }, [issues, toast]);
+  }, [issues, toast, isAuthenticated]);
 
   const getStatusColor = (status: string): string => {
     switch (status) {
@@ -169,7 +182,7 @@ const MapView = () => {
       <Box position="relative" h="calc(100vh - 100px)" borderRadius="lg" overflow="hidden">
         <Box ref={mapContainer} h="100%" />
         
-        {isLoading && (
+        {isLoading && isAuthenticated && (
           <Box
             position="absolute"
             top="50%"
@@ -181,6 +194,28 @@ const MapView = () => {
             boxShadow="lg"
           >
             <Spinner size="xl" color="blue.500" />
+          </Box>
+        )}
+        
+        {/* Login prompt for unauthenticated users */}
+        {!isAuthenticated && (
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            bg={popupBg}
+            p={6}
+            borderRadius="md"
+            boxShadow="lg"
+            textAlign="center"
+          >
+            <VStack spacing={4}>
+              <Text fontSize="lg">Please log in to view issues on the map</Text>
+              <Button colorScheme="blue" onClick={() => navigate('/login')}>
+                Login
+              </Button>
+            </VStack>
           </Box>
         )}
         

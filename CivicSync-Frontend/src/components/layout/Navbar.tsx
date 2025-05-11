@@ -16,73 +16,76 @@ const Navbar = () => {
           <Box fontWeight="bold" fontSize="xl">CivicSync</Box>
         </RouterLink>
 
-        <Flex alignItems={'center'}>
-          <Stack direction={'row'} spacing={7}>
+        <Stack direction={'row'} spacing={7}>
+          <Button
+            as={RouterLink}
+            to="/map"
+            variant="ghost"
+            fontWeight="normal"
+          >
+            Map View
+          </Button>
+          
+          {/* Make Feed button visible to all users */}
+          <Button
+            as={RouterLink}
+            to="/feed"
+            variant="ghost"
+            fontWeight="normal"
+          >
+            Feed
+          </Button>
+          
+          {isAuthenticated && (
             <Button
               as={RouterLink}
-              to="/map"
+              to="/analytics"
               variant="ghost"
               fontWeight="normal"
             >
-              Map View
+              Analytics
             </Button>
-            <Button
-              as={RouterLink}
-              to="/feed"
-              variant="ghost"
-              fontWeight="normal"
-            >
-              Feed
-            </Button>
-            {isAuthenticated && (
+          )}
+          
+          <IconButton
+            aria-label="Toggle color mode"
+            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            onClick={toggleColorMode}
+            variant="ghost"
+          />
+          
+          {isAuthenticated ? (
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="ghost">
+                Profile
+              </MenuButton>
+              <MenuList>
+                <MenuItem as={RouterLink} to="/profile">My Profile</MenuItem>
+                <MenuItem as={RouterLink} to="/my-issues">My Issues</MenuItem>
+                <MenuItem onClick={logout}>Logout</MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <>
               <Button
                 as={RouterLink}
-                to="/analytics"
+                to="/login"
                 variant="ghost"
                 fontWeight="normal"
               >
-                Analytics
+                Login
               </Button>
-            )}
-            <IconButton
-              aria-label="Toggle color mode"
-              icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-              onClick={toggleColorMode}
-              variant="ghost"
-            />
-            {isAuthenticated ? (
-              <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="ghost">
-                  Profile
-                </MenuButton>
-                <MenuList>
-                  <MenuItem as={RouterLink} to="/profile">My Profile</MenuItem>
-                  <MenuItem as={RouterLink} to="/my-issues">My Issues</MenuItem>
-                  <MenuItem onClick={logout}>Logout</MenuItem>
-                </MenuList>
-              </Menu>
-            ) : (
-              <>
-                <Button
-                  as={RouterLink}
-                  to="/login"
-                  variant="ghost"
-                  fontWeight="normal"
-                >
-                  Login
-                </Button>
-                <Button
-                  as={RouterLink}
-                  to="/register"
-                  colorScheme="blue"
-                  fontWeight="normal"
-                >
-                  Register
-                </Button>
-              </>
-            )}
-          </Stack>
-        </Flex>
+              <Button
+                as={RouterLink}
+                to="/register"
+                colorScheme="blue"
+                fontWeight="normal"
+              >
+                Register
+              </Button>
+            </>
+          )}
+        </Stack>
       </Flex>
     </Box>
   );

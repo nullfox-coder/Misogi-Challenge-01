@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import ReportIssue from './pages/ReportIssue';
 import MyIssues from './pages/MyIssues';
 import PublicFeed from './pages/PublicFeed';
+import Analytics from './pages/Analytics';
 import { AuthProvider } from './context/AuthContext';
 import './App.css'
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/report-issue" element={<ReportIssue />} />
         <Route path="/my-issues" element={<MyIssues />} />
         <Route path="/feed" element={<PublicFeed />} />
+        <Route path="/analytics" element={<Analytics />} />
       </Routes>
     </AuthProvider>
   );

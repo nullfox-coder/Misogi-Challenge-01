@@ -34,6 +34,16 @@ const Navbar = () => {
             >
               Feed
             </Button>
+            {isAuthenticated && (
+              <Button
+                as={RouterLink}
+                to="/analytics"
+                variant="ghost"
+                fontWeight="normal"
+              >
+                Analytics
+              </Button>
+            )}
             <IconButton
               aria-label="Toggle color mode"
               icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}

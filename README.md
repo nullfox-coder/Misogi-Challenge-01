@@ -2,6 +2,10 @@
 
 CivicSync is a comprehensive civic engagement platform that empowers citizens to report infrastructure issues, vote on critical problems, and collaborate with authorities to improve their communities.
 
+## Working Link -
+
+```https://civicsync.nullfox.tech/```
+
 ## Tech Stack
 
 ### Frontend
